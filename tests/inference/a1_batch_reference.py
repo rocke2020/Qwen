@@ -1,11 +1,16 @@
+import os
+import sys
+
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from transformers import GenerationConfig
-import os, sys
+from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
+
 sys.path.append(os.path.abspath('.'))
-from qwen_generation_utils import make_context, decode_tokens, get_stop_words_ids
 from icecream import ic
-ic.configureOutput(includeContext=True, argToStringFunction=lambda _: str(_))
+
+from qwen_generation_utils import (decode_tokens, get_stop_words_ids,
+                                   make_context)
+
+ic.configureOutput(includeContext=True, argToStringFunction=str)
 ic.lineWrapWidth = 120
 
 
