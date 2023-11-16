@@ -29,7 +29,7 @@ model = AutoModelForCausalLM.from_pretrained(
     trust_remote_code=True
 ).eval()
 model.generation_config = GenerationConfig.from_pretrained(model_7b_chat_path, pad_token_id=tokenizer.pad_token_id)
-
+ic(model.generation_config.chat_format)
 all_raw_text = ["我想听你说爱我。", "今天我想吃点啥，甜甜的，推荐下", "我马上迟到了，怎么做才能不迟到"]
 batch_raw_text = []
 for q in all_raw_text:

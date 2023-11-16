@@ -1,13 +1,15 @@
-import os, sys
-import re, random
-from tqdm import tqdm
-from collections import defaultdict
-import psutil
-from pathlib import Path
-import time
 import logging
+import os
+import random
+import re
 import resource
+import sys
+import time
+from collections import defaultdict
+from pathlib import Path
 
+import psutil
+from tqdm import tqdm
 
 logger = logging.getLogger()
 logging.basicConfig(
@@ -53,9 +55,9 @@ def check_process_status(pid):
 
 if __name__ == "__main__":
     ids = [
-        672669,
-        672068,
+        # 4188653,
+        4188155,
     ]
     kill_multi_prcoesss(ids)
     # check_process_status(786967)
-    pass
+    

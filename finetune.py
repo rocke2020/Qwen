@@ -16,6 +16,7 @@ from transformers import Trainer, GPTQConfig, deepspeed
 from transformers.trainer_pt_utils import LabelSmoother
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 from accelerate.utils import DistributedType
+from comm_utils.arg_util import save_args
 
 
 IGNORE_TOKEN_ID = LabelSmoother.ignore_index
@@ -242,6 +243,23 @@ def make_supervised_data_module(
     rank0_print("Loading data...")
 
     train_json = json.load(open(data_args.data_path, "r"))
+    if 'moss-003-sft' in data_args.data_path:
+        for item in train_json:
+            item['conversations'] = []
+            for conv in item['conversation']:
+                for turn in conv:
+                    item['conversations'].append(
+                        {
+                        'from': 'user',
+                        'value': turn['human']
+                        },
+                    )
+                    item['conversations'].append(
+                        {
+                        'from': 'assistant',
+                        'value': turn['assistant']
+                        }
+                    )
     train_dataset = dataset_cls(train_json, tokenizer=tokenizer, max_len=max_len)
 
     if data_args.eval_data_path:
@@ -265,7 +283,7 @@ def train():
         training_args,
         lora_args,
     ) = parser.parse_args_into_dataclasses()
-
+    save_args(model_args, data_args, training_args, lora_args)
     # This serves for single-gpu qlora.
     if getattr(training_args, 'deepspeed', None) and int(os.environ.get("WORLD_SIZE", 1))==1:
         training_args.distributed_state.distributed_type = DistributedType.DEEPSPEED
@@ -302,7 +320,8 @@ def train():
         config=config,
         cache_dir=training_args.cache_dir,
         device_map=device_map,
-        low_cpu_mem_usage=True if training_args.use_lora and not lora_args.q_lora else False,
+        low_cpu_mem_usage=True,
+        # low_cpu_mem_usage=True if training_args.use_lora and not lora_args.q_lora else False,
         trust_remote_code=True,
         quantization_config=GPTQConfig(
             bits=4, disable_exllama=True

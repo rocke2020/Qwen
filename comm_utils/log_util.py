@@ -2,6 +2,9 @@ import logging, os
 import time
 import contextlib
 from pandas import DataFrame
+from icecream import ic
+ic.configureOutput(includeContext=True, argToStringFunction=str)
+ic.lineWrapWidth = 120
 
 
 _nameToLevel = {

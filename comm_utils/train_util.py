@@ -1,7 +1,9 @@
+import random
+
 import numpy as np
 import torch
-import random
 import torch.optim as optim
+
 from .log_util import logger
 
 

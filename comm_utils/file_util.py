@@ -1,17 +1,18 @@
-import json
 import dataclasses
-from decimal import Decimal
-import dataclasses, json
-from typing import Tuple, List
-import numpy
-import math
 import hashlib
+import json
+import math
 import socket
-from comm_utils.log_util import logger
+from decimal import Decimal
+from typing import List, Tuple
+
+import numpy
 import yaml
 
+from comm_utils.log_util import logger
 
-class FileUtil(object):
+
+class FileUtil():
     """
     文件工具类
     """
@@ -42,12 +43,26 @@ class FileUtil(object):
         with open(file_path, "r", encoding="utf-8") as f:
             data = json.load(f)
         return data
+    
+    @classmethod
+    def read_jsonl(cls, file_path):
+        data = []
+        with open(file_path, "r", encoding="utf-8") as f:
+            for line in f:
+                data.append(json.loads(line))
+        logger.info(f'Read jsonl file {file_path} with {len(data)} lines')
+        return data
 
     @classmethod
     def write_json(cls, data, file_path, ensure_ascii=False):
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=ensure_ascii, indent=4, cls=JSONEncoder)
 
+    @classmethod
+    def write_jsonl(cls, data, file_path, ensure_ascii=False):
+        with open(file_path, 'w', encoding='utf-8') as f:
+            for line in data:
+                f.write(json.dumps(line, ensure_ascii=ensure_ascii, indent=4, cls=JSONEncoder) + '\n')
 
     @classmethod
     def read_yml(cls, file_path):
@@ -56,6 +71,8 @@ class FileUtil(object):
             config = yaml.safe_load(file)
         config = Bunch(**config)
         return config
+
+file_util = FileUtil()
 
 
 def dataclass_from_dict(klass, dikt):
