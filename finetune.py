@@ -17,7 +17,7 @@ from transformers.trainer_pt_utils import LabelSmoother
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 from accelerate.utils import DistributedType
 from comm_utils.arg_util import save_args
-
+from data_process.preprocess.check_sft_data import convert_moss_to_qwen_input
 
 IGNORE_TOKEN_ID = LabelSmoother.ignore_index
 
@@ -141,7 +141,7 @@ def preprocess(
     # Apply prompt templates
     input_ids, targets = [], []
     for i, source in enumerate(sources):
-        if roles[source[0]["from"]] != roles["user"]:
+        if source[0]["from"] != "user":
             source = source[1:]
 
         input_id, target = [], []
@@ -163,6 +163,9 @@ def preprocess(
                 raise NotImplementedError
             target += _target
         assert len(input_id) == len(target)
+        if len(input_id) > max_len:
+            input_id = input_id[:max_len]
+            target = target[:max_len]
         input_id += [tokenizer.pad_token_id] * (max_len - len(input_id))
         target += [IGNORE_TOKEN_ID] * (max_len - len(target))
         input_ids.append(input_id[:max_len])
@@ -244,22 +247,7 @@ def make_supervised_data_module(
 
     train_json = json.load(open(data_args.data_path, "r"))
     if 'moss-003-sft' in data_args.data_path:
-        for item in train_json:
-            item['conversations'] = []
-            for conv in item['conversation']:
-                for turn in conv:
-                    item['conversations'].append(
-                        {
-                        'from': 'user',
-                        'value': turn['human']
-                        },
-                    )
-                    item['conversations'].append(
-                        {
-                        'from': 'assistant',
-                        'value': turn['assistant']
-                        }
-                    )
+        convert_moss_to_qwen_input(train_json)
     train_dataset = dataset_cls(train_json, tokenizer=tokenizer, max_len=max_len)
 
     if data_args.eval_data_path:
