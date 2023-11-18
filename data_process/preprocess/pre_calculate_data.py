@@ -14,11 +14,11 @@ from comm_utils.log_util import ic
 
 
 train_params = {
-    "data_count": 1074551,
+    "data_count": 100_000,
     "num_train_epochs": 3,
     "num_gpus": 2,
-    "per_device_train_batch_size": 8,
-    "gradient_accumulation_steps": 2,
+    "per_device_train_batch_size": 6,
+    "gradient_accumulation_steps": 8,
 }
 
 

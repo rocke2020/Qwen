@@ -214,6 +214,7 @@ class LazySupervisedDataset(Dataset):
         self.max_len = max_len
 
         rank0_print("Formatting inputs...Skip in lazy mode")
+        rank0_print(f"Total number of examples: {len(raw_data)}")
         self.tokenizer = tokenizer
         self.raw_data = raw_data
         self.cached_data_dict = {}
