@@ -11,6 +11,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import transformers
 from icecream import ic
 from pandas import DataFrame
 from tqdm import tqdm
@@ -23,6 +24,7 @@ from comm_utils.file_util import file_util
 SEED = 0
 random.seed(SEED)
 np.random.seed(SEED)
+
 moss_small_file = "/mnt/nas1/dong-qichang/corpus/fine-tune/moss-003-sft-data/moss-003-sft-data-small.jsonl"
 moss_small_json_file = "/mnt/nas1/dong-qichang/corpus/fine-tune/moss-003-sft-data/moss-003-sft-data-small.json"
 moss_tiny_json_file = "/mnt/nas1/dong-qichang/corpus/fine-tune/moss-003-sft-data/moss-003-sft-data-tiny.json"
@@ -68,10 +70,42 @@ def convert_moss_to_qwen_input(train_json):
                 item["conversations"].append({"from": "assistant", "value": value})
 
 
-def main():
+def load_tokenizer():
+    """ """
+    cache_dir = None
+    model_max_length = 512
+    model_name_or_path = "/mnt/nas1/models/qwen/Qwen-7B-Chat-Int8"
+    tokenizer = transformers.AutoTokenizer.from_pretrained(
+        model_name_or_path,
+        cache_dir=cache_dir,
+        model_max_length=model_max_length,
+        padding_side="right",
+        use_fast=False,
+        trust_remote_code=True,
+    )
+    tokenizer.pad_token_id = tokenizer.eod_id
+    return tokenizer
+
+
+def check_tokenizer():
+    """ """
+    tokenizer = load_tokenizer()
+
     data = json.load(open(moss_tiny_json_file, "r"))
-    ic(len(data))
-    convert_moss_to_qwen_input(data)
+    input0 = []
+    for sent in data[0]["conversation"]:
+        input0.append(sent["human"])
+        input0.append(sent["assistant"])
+    input_test = "\n".join(input0)
+    ic(input_test)
+    ic(len(input_test))
+
+    result = tokenizer(input_test)
+    ic(len(result.input_ids))
+
+
+def main():
+    check_tokenizer()
 
 
 if __name__ == "__main__":
