@@ -40,6 +40,7 @@ def save_args(*multi_args, output_dir='.', with_time_at_filename=False):
         for args in multi_args:
             for arg, value in vars(args).items():
                 f.write(f"{arg}: {value}\n")
+            f.write("\n")
 
 
 def log_args(*multi_args, logger=None):

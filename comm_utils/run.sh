@@ -1,1 +1,1 @@
-python utils/os_util.py 2>&1  </dev/null | tee utils/os_util.log
+python comm_utils/os_util.py 2>&1  </dev/null | tee comm_utils/os_util.log
