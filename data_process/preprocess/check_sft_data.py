@@ -61,7 +61,23 @@ def read_moss():
 
 
 def convert_moss_to_qwen_input(train_json):
-    """ """
+    """
+    [
+        {
+            "id": "identity_0",
+            "conversations": [
+                {
+                    "from": "user",
+                    "value": "你好"
+                },
+                {
+                    "from": "assistant",
+                    "value": "我是一个语言模型，我叫通义千问。"
+                }
+            ]
+        }
+    ]
+    """
     for item in train_json:
         item["conversations"] = []
         for conv in item["conversation"]:
