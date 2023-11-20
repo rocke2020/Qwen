@@ -51,7 +51,7 @@ peft_model_path = "/mnt/nas1/models/qwen/Qwen-7B-Chat-int8-moss-small/checkpoint
 config = PeftConfig.from_pretrained(peft_model_path)
 ic(config)
 
-load_basic_model = 1
+load_basic_model = 0
 load_in_normal_order = 0
 if load_basic_model:
     model = AutoModelForCausalLM.from_pretrained(
@@ -81,6 +81,7 @@ model.generation_config = generation_config
 
 query = "重点领域产业关键与共性技术攻关工程有哪些?"
 response, history = model.chat(tokenizer, query, history=None)
+# base model response: 《“十四五”国家科技创新规划》提出，实施重点领域产业关键与共性技术攻关工程。聚焦芯片与集成电路、前沿新材料、生命健康、人工智能、新能源、节能环保等重点产业领域，强化前瞻性基础研究和引领性原创成果重大突破，实现重大标志性原创成果重大突破。
 print(response)
 
 # all_raw_text = ["重点领域产业关键与共性技术攻关工程有哪些"]
