@@ -27,11 +27,13 @@ np.random.seed(SEED)
 
 moss_small_file = "/mnt/nas1/dong-qichang/corpus/fine-tune/moss-003-sft-data/moss-003-sft-data-small.jsonl"
 moss_small_json_file = "/mnt/nas1/dong-qichang/corpus/fine-tune/moss-003-sft-data/moss-003-sft-data-small.json"
+moss_small2_json_file = "/mnt/nas1/dong-qichang/corpus/fine-tune/moss-003-sft-data/moss-003-sft-data-small2.json"
 moss_tiny_json_file = "/mnt/nas1/dong-qichang/corpus/fine-tune/moss-003-sft-data/moss-003-sft-data-tiny.json"
 moss_orig_file = (
     "/mnt/nas1/dong-qichang/corpus/fine-tune/moss-003-sft-data/moss-003-sft-data.jsonl"
 )
 small_num = 100_000
+small2_num = 200_000
 tiny_num = 100
 
 
@@ -44,16 +46,17 @@ def read_moss():
         for line in f:
             data.append(json.loads(line))
             # print(data[-1])
-            if count == small_num:
+            if count == small2_num:
                 break
             count += 1
             # break
     ic(len(data))
 
     with open(moss_small_file, "w", encoding="utf-8") as f:
-        for line in data:
+        for line in data[:small_num]:
             f.write(json.dumps(line, ensure_ascii=False) + "\n")
-    file_util.write_json(data, moss_small_json_file, ensure_ascii=False)
+    file_util.write_json(data[:small_num], moss_small_json_file, ensure_ascii=False)
+    file_util.write_json(data, moss_small2_json_file, ensure_ascii=False)
 
     tiny_data = data[:tiny_num] + data[-tiny_num:]
     file_util.write_json(tiny_data, moss_tiny_json_file, ensure_ascii=False)
@@ -125,5 +128,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
-    # read_moss()
+    # main()
+    read_moss()

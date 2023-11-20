@@ -27,7 +27,7 @@ torchrun $DISTRIBUTED_ARGS finetune.py \
     --data_path $DATA \
     --fp16 True \
     --output_dir /mnt/nas1/models/qwen/Qwen-7B-Chat-int8-moss-small \
-    --num_train_epochs 3 \
+    --num_train_epochs 1 \
     --per_device_train_batch_size 6 \
     --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 8 \
@@ -35,7 +35,7 @@ torchrun $DISTRIBUTED_ARGS finetune.py \
     --save_strategy "steps" \
     --save_steps 500 \
     --save_total_limit 2 \
-    --learning_rate 2e-4 \
+    --learning_rate 1e-4 \
     --weight_decay 0.1 \
     --adam_beta2 0.95 \
     --warmup_ratio 0.01 \
