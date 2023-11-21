@@ -84,9 +84,10 @@ def convert_moss_to_qwen_input(train_json):
     for item in train_json:
         item["conversations"] = []
         for conv in item["conversation"]:
-            for value in conv.values():
-                item["conversations"].append({"from": "user", "value": value})
-                item["conversations"].append({"from": "assistant", "value": value})
+            for role, sent in conv.items():
+                if role == "human":
+                    role = "user"
+                item["conversations"].append({"from": role, "value": sent})
 
 
 def load_tokenizer():
@@ -123,10 +124,18 @@ def check_tokenizer():
     ic(len(result.input_ids))
 
 
+def check_convert():
+    """ """
+    data = file_util.read_json(moss_tiny_json_file)
+    convert_moss_to_qwen_input(data)
+    ic(data[0])
+
+
 def main():
-    check_tokenizer()
+    # read_moss()
+    # check_tokenizer()
+    check_convert()
 
 
 if __name__ == "__main__":
-    # main()
-    read_moss()
+    main()
