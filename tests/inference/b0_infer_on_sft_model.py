@@ -47,12 +47,12 @@ generation_config = GenerationConfig.from_pretrained(
 )
 ic(generation_config)
 
-peft_model_path = "/mnt/nas1/models/qwen/Qwen-7B-Chat-int8-moss-small/checkpoint-1500"
+peft_model_path = "/mnt/nas1/models/qwen/Qwen-7B-Chat-int8-moss-small"
 config = PeftConfig.from_pretrained(peft_model_path)
 ic(config)
 
 load_basic_model = 0
-load_in_normal_order = 0
+load_in_normal_order = 1
 if load_basic_model:
     model = AutoModelForCausalLM.from_pretrained(
         model_name_or_path, trust_remote_code=True
