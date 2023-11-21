@@ -137,5 +137,10 @@ def main():
     check_convert()
 
 
+def main():
+    # read_moss()
+    # check_tokenizer()
+    check_convert()
+
 if __name__ == "__main__":
     main()

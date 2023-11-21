@@ -300,6 +300,7 @@ def train():
     )
     config.use_cache = False
 
+    rank0_print(f"use_lora {training_args.use_lora}, q_lora {lora_args.q_lora}")
     # Load model and tokenizer
     model = transformers.AutoModelForCausalLM.from_pretrained(
         model_args.model_name_or_path,
