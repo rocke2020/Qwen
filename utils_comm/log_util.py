@@ -21,7 +21,7 @@ datefmt = '%y-%m-%d %H:%M:%S'
 
 def get_logger(name=None, log_file=None, log_level=logging.DEBUG, log_level_name=''):
     """ default log level DEBUG """
-    logger = logging.getLogger(name)
+    _logger = logging.getLogger(name)
     logging.basicConfig(format=fmt, datefmt=datefmt)
     if log_file is not None:
         log_file_folder = os.path.split(log_file)[0]
@@ -29,11 +29,11 @@ def get_logger(name=None, log_file=None, log_level=logging.DEBUG, log_level_name
             os.makedirs(log_file_folder, exist_ok=True)
         fh = logging.FileHandler(log_file, 'w', encoding='utf-8')
         fh.setFormatter(logging.Formatter(fmt, datefmt))
-        logger.addHandler(fh)
+        _logger.addHandler(fh)
     if log_level_name in _nameToLevel:
         log_level = _nameToLevel[log_level_name]
-    logger.setLevel(log_level)
-    return logger
+    _logger.setLevel(log_level)
+    return _logger
 
 
 def log_df_basic_info(df: DataFrame, log_func=None, comments='', full_info=False):

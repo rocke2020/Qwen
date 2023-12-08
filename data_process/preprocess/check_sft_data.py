@@ -19,7 +19,7 @@ from tqdm import tqdm
 ic.configureOutput(includeContext=True, argToStringFunction=str)
 ic.lineWrapWidth = 120
 sys.path.append(os.path.abspath("."))
-from comm_utils.file_util import file_util
+from utils_comm.file_util import file_util
 
 SEED = 0
 random.seed(SEED)
@@ -86,7 +86,7 @@ def convert_moss_to_qwen_input(train_json):
         for conv in item["conversation"]:
             for role, sent in conv.items():
                 if role == "human":
-                    role = 'user'
+                    role = "user"
                 item["conversations"].append({"from": role, "value": sent})
 
 
@@ -136,6 +136,6 @@ def main():
     # check_tokenizer()
     check_convert()
 
+
 if __name__ == "__main__":
     main()
-    
