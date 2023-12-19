@@ -52,7 +52,7 @@ config = PeftConfig.from_pretrained(peft_model_path)
 ic(config)
 
 load_basic_model = 0
-load_in_normal_order = 1
+load_in_normal_order = 0
 if load_basic_model:
     model = AutoModelForCausalLM.from_pretrained(
         model_name_or_path, trust_remote_code=True
@@ -60,7 +60,7 @@ if load_basic_model:
     ic("loads base model done")
 else:
     if load_in_normal_order:
-        model = transformers.AutoModelForCausalLM.from_pretrained(
+        model = AutoModelForCausalLM.from_pretrained(
             model_name_or_path, trust_remote_code=True
         )
         ic("loads base model done")
