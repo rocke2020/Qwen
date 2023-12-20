@@ -40,7 +40,7 @@ tokenizer = transformers.AutoTokenizer.from_pretrained(
     use_fast=False,
     trust_remote_code=True,
 )
-tokenizer.pad_token_id = tokenizer.eod_id
+tokenizer.pad_token_id = tokenizer.eod_id # type: ignore
 ic("loads tokenizer done")
 generation_config = GenerationConfig.from_pretrained(
     model_name_or_path, trust_remote_code=True
@@ -75,7 +75,7 @@ ic(model.device)
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 ic(device)
-model = model.to(device)
+model = model.to(device) # type: ignore
 model.eval()
 model.generation_config = generation_config
 

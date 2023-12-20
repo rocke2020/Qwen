@@ -16,7 +16,7 @@ from transformers import Trainer, GPTQConfig, deepspeed
 from transformers.trainer_pt_utils import LabelSmoother
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 from accelerate.utils import DistributedType
-from comm_utils.arg_util import save_args
+from utils_comm.arg_util import save_args
 from data_process.preprocess.check_sft_data import convert_moss_to_qwen_input
 
 IGNORE_TOKEN_ID = LabelSmoother.ignore_index

@@ -5,6 +5,14 @@ import torch
 from transformers import AutoTokenizer
 from transformers.generation.logits_process import LogitsProcessorList
 from packaging import version
+import logging
+
+METADATA_FIELDS = ("_from_model_config", "_commit_hash", "_original_object_hash", "transformers_version")
+
+logger = logging.getLogger()
+logging.basicConfig(
+    level=logging.INFO, datefmt='%y-%m-%d %H:%M',
+    format='%(asctime)s %(filename)s %(lineno)d: %(message)s')
 
 _ERROR_BAD_CHAT_FORMAT = """\
 We detect you are probably using the pretrained model (rather than chat model) for chatting, since the chat_format in generation_config is not "chatml".
@@ -108,6 +116,7 @@ class vLLMWrapper:
                tensor_parallel_size: int = 1,
                gpu_memory_utilization: float = 0.98,
                dtype: str = "bfloat16",
+               verbose = True,
                **kwargs):
 
         if dtype not in ("bfloat16", "float16", "float32"):
@@ -116,11 +125,12 @@ class vLLMWrapper:
 
         # build generation_config
         self.generation_config = GenerationConfig.from_pretrained(model_dir, trust_remote_code=trust_remote_code)
-
+        if verbose:
+            logger.info("self.generation_config\n{}".format(self.generation_config))
         # build tokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(model_dir, trust_remote_code=True)
         self.tokenizer.eos_token_id = self.generation_config.eos_token_id
-
+        logger.info("tokenizer loaded from model dir")
         self.stop_words_ids = []
 
         from vllm import LLM
@@ -164,23 +174,19 @@ class vLLMWrapper:
             # make a copy of the user's input such that is is left untouched
             history = copy.deepcopy(history)
 
-        extra_stop_words_ids = kwargs.get('stop_words_ids', None)
-        if extra_stop_words_ids is None:
-            extra_stop_words_ids = []
-
         max_window_size = kwargs.get('max_window_size', None)
         if max_window_size is None:
             max_window_size = generation_config.max_window_size
-
+        logger.info(generation_config.temperature)
         from vllm.sampling_params import SamplingParams
         sampling_kwargs = {
             "stop_token_ids": self.stop_words_ids,
             "early_stopping": False,
-            "top_p": generation_config.top_p,
+            "top_p": 0.9,
             "top_k": -1 if generation_config.top_k == 0 else generation_config.top_k,
             "temperature": generation_config.temperature,
             "max_tokens": generation_config.max_new_tokens,
-            "repetition_penalty": generation_config.repetition_penalty
+            "repetition_penalty": generation_config.repetition_penalty,
         }
         if not self.__vllm_support_repetition_penalty:
             sampling_kwargs.pop("repetition_penalty")
@@ -219,10 +225,11 @@ class vLLMWrapper:
 
         return response, history
 
+
 if __name__ == '__main__':
 
-    model_dir = 'Qwen/Qwen-72B-Chat'
-    tensor_parallel_size = 2
+    model_dir = '/mnt/nas1/models/qwen/Qwen-7B-Chat'
+    tensor_parallel_size = 1
 
     model = vLLMWrapper(model_dir,
                         tensor_parallel_size=tensor_parallel_size,
@@ -230,10 +237,13 @@ if __name__ == '__main__':
 
     response, history = model.chat(query="你好",
                                    history=None)
-    print(response)
+    print('1,', response, flush=True)
     response, history = model.chat(query="给我讲一个年轻人奋斗创业最终取得成功的故事。",
                                    history=history)
-    print(response)
+    print('2,', response, flush=True)
     response, history = model.chat(query="给这个故事起一个标题",
                                    history=history)
-    print(response)
+    print('3,', response, flush=True)
+    response, history = model.chat(query="再讲一个不同的创业故事,情节复杂和具体的长一点的故事，逆袭成功",
+                                   history=history)
+    print('4,', response, flush=True)
