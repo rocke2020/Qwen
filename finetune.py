@@ -278,6 +278,7 @@ def train():
 
     device_map = "auto"
     world_size = int(os.environ.get("WORLD_SIZE", 1))
+    rank0_print(f'world_size {world_size}, local_rank {local_rank}')
     ddp = world_size != 1
     if lora_args.q_lora:
         device_map = {"": int(os.environ.get("LOCAL_RANK") or 0)} if ddp else "auto"

@@ -6,6 +6,7 @@ from transformers import AutoTokenizer
 from transformers.generation.logits_process import LogitsProcessorList
 from packaging import version
 import logging
+import random
 
 METADATA_FIELDS = ("_from_model_config", "_commit_hash", "_original_object_hash", "transformers_version")
 
@@ -141,13 +142,15 @@ class vLLMWrapper:
             self.__vllm_support_repetition_penalty = False
 
         quantization = getattr(kwargs, 'quantization', None)
-
+        seed = random.randrange(2**32)
+        logger.info("seed: %s", seed)
         self.model = LLM(model=model_dir,
                             tokenizer=model_dir,
                             tensor_parallel_size=tensor_parallel_size,
                             trust_remote_code=trust_remote_code,
                             quantization=quantization,
                             gpu_memory_utilization=gpu_memory_utilization,
+                            seed=seed,
                             dtype=dtype)
 
         for stop_id in get_stop_words_ids(self.generation_config.chat_format, self.tokenizer):
@@ -244,6 +247,6 @@ if __name__ == '__main__':
     response, history = model.chat(query="给这个故事起一个标题",
                                    history=history)
     print('3,', response, flush=True)
-    response, history = model.chat(query="再讲一个不同的创业故事,情节复杂和具体的长一点的故事，逆袭成功",
+    response, history = model.chat(query="再讲一个中年人的创业故事,情节复杂和具体的长一点的故事，逆袭成功",
                                    history=history)
     print('4,', response, flush=True)
