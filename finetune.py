@@ -16,7 +16,7 @@ from transformers import Trainer, GPTQConfig, deepspeed
 from transformers.trainer_pt_utils import LabelSmoother
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 from accelerate.utils import DistributedType
-from comm_utils.arg_util import save_args
+from utils_comm.arg_util import save_args
 from data_process.preprocess.check_sft_data import convert_moss_to_qwen_input
 
 IGNORE_TOKEN_ID = LabelSmoother.ignore_index
@@ -274,22 +274,17 @@ def train():
     if getattr(training_args, 'deepspeed', None) and int(os.environ.get("WORLD_SIZE", 1))==1:
         training_args.distributed_state.distributed_type = DistributedType.DEEPSPEED
 
-    compute_dtype = (
-        torch.float16
-        if training_args.fp16
-        else (torch.bfloat16 if training_args.bf16 else torch.float32)
-    )
-
     local_rank = training_args.local_rank
 
-    device_map = None
+    device_map = "auto"
     world_size = int(os.environ.get("WORLD_SIZE", 1))
+    rank0_print(f'world_size {world_size}, local_rank {local_rank}')
     ddp = world_size != 1
     if lora_args.q_lora:
-        device_map = {"": int(os.environ.get("LOCAL_RANK") or 0)} if ddp else None
+        device_map = {"": int(os.environ.get("LOCAL_RANK") or 0)} if ddp else "auto"
         if len(training_args.fsdp) > 0 or deepspeed.is_deepspeed_zero3_enabled():
             logging.warning(
-                "FSDP or ZeRO3 are not incompatible with QLoRA."
+                "FSDP or ZeRO3 are incompatible with QLoRA."
             )
 
     # Set RoPE scaling factor

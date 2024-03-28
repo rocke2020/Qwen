@@ -19,7 +19,7 @@ from tqdm import tqdm
 ic.configureOutput(includeContext=True, argToStringFunction=str)
 ic.lineWrapWidth = 120
 sys.path.append(os.path.abspath("."))
-from comm_utils.file_util import file_util
+from utils_comm.file_util import file_util
 
 SEED = 0
 random.seed(SEED)
@@ -136,11 +136,6 @@ def main():
     # check_tokenizer()
     check_convert()
 
-
-def main():
-    # read_moss()
-    # check_tokenizer()
-    check_convert()
 
 if __name__ == "__main__":
     main()

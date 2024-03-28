@@ -9,7 +9,7 @@ from typing import List, Tuple
 import numpy
 import yaml
 
-from comm_utils.log_util import logger
+from utils_comm.log_util import logger
 
 
 class FileUtil():
