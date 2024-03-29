@@ -276,7 +276,7 @@ def train():
 
     local_rank = training_args.local_rank
 
-    device_map = "auto"
+    device_map = None
     world_size = int(os.environ.get("WORLD_SIZE", 1))
     rank0_print(f'world_size {world_size}, local_rank {local_rank}')
     ddp = world_size != 1
@@ -286,6 +286,19 @@ def train():
             logging.warning(
                 "FSDP or ZeRO3 are incompatible with QLoRA."
             )
+
+    is_chat_model = 'chat' in model_args.model_name_or_path.lower()
+    if (
+            training_args.use_lora
+            and not lora_args.q_lora
+            and deepspeed.is_deepspeed_zero3_enabled()
+            and not is_chat_model
+    ):
+        raise RuntimeError("ZeRO3 is incompatible with LoRA when finetuning on base model.")
+
+    model_load_kwargs = {
+        'low_cpu_mem_usage': not deepspeed.is_deepspeed_zero3_enabled(),
+    }
 
     # Set RoPE scaling factor
     config = transformers.AutoConfig.from_pretrained(
@@ -308,6 +321,7 @@ def train():
         )
         if training_args.use_lora and lora_args.q_lora
         else None,
+        **model_load_kwargs,
     )
     tokenizer = transformers.AutoTokenizer.from_pretrained(
         model_args.model_name_or_path,
@@ -320,7 +334,7 @@ def train():
     tokenizer.pad_token_id = tokenizer.eod_id
 
     if training_args.use_lora:
-        if lora_args.q_lora or 'chat' in model_args.model_name_or_path.lower():
+        if lora_args.q_lora or is_chat_model:
             modules_to_save = None
         else:
             modules_to_save = ["wte", "lm_head"]
